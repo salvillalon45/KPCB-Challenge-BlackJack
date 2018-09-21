@@ -1,0 +1,36 @@
+def get_bet_choice() -> str:
+    """
+    This function asks the user whether he would want to Raise(R) or Stay(S). This function returns the character if it is valid,
+    else keeps asking the user to enter a valid input
+    """
+    user_input = input().lower()
+
+    while 1:
+        if user_input == "r" or user_input == "s":
+            return user_input
+        else:
+            print("Incorrect choice, choose either Raise(R) or Stay(S)")
+
+
+def get_bet_amount(available_for_bet:int) -> int:
+    """
+    This function asks the user the amount he would like to bet by,
+    checks if it is a valid bet amount and returns it
+    """
+    while 1:
+        user_input = int(input("How much would you like to raise by? "))
+
+        if user_input >= available_for_bet:
+            print("Not enough money to make this bet")
+        else:
+            return user_input
+
+
+            # def sort_deck(card_deck:[Card]) -> [Card]:
+            #     """
+            #     This function takes in a list of Card objects, sorts the list
+            #     and returns the sorted list
+            #     """
+            #     print(card_deck)
+            #     card_deck.sort()
+            #     return card_deck

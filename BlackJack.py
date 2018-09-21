@@ -55,15 +55,6 @@ def make_card(name:str, value:int) -> Card:
     return card_obj
 
 
-# def sort_deck(card_deck:[Card]) -> [Card]:
-#     """
-#     This function takes in a list of Card objects, sorts the list
-#     and returns the sorted list
-#     """
-#     print(card_deck)
-#     card_deck.sort()
-#     return card_deck
-
 
 def make_card_deck_list(my_deck:[{str:int}]) -> [Card]:
     """
@@ -108,10 +99,7 @@ At the Friend Computer's BlackJack Tables the closest player to 21, with a value
 If you exceed 21, you lose. If the computer has card values closer to 21, you lose.
 If you are closer to 21 than the computer, then you win!
 Note: Ace defaults to 11, but will change to 1, should you exceed 21.
-Also Beware the Friend Computer NEVER turns down a bet and is infinitely wealthy.
 Let's get started
-Your hand contains:
-
 """)
 
 
@@ -120,7 +108,8 @@ def draw_card(available_cards:[Card]) -> Card:
     This function returns the last most Card in the list
     that is given as input and returns the Card
     """
-    last_most_card = available_cards[-1]
+
+    last_most_card = available_cards.pop(-1)
     return last_most_card
 
 
@@ -130,10 +119,9 @@ def create_starting_hand(available_cards:[Card], num_to_draw:int) -> [Card]:
     number of cards to draw and returns the list
     """
     starting_list = list()
-    index = 0
+
     for card_obj in range(num_to_draw):
-        starting_list.append(available_cards[index])
-        index = index + 1
+        starting_list.append(draw_card(available_cards))
 
     return starting_list
 
@@ -166,10 +154,14 @@ def print_player_hand(player_hand:[Card]) -> None:
     the name, value of each card along with the value of all the cards
     in the list
     """
+    print("")
+    print("Your hand contains:")
+    print("")
     for card_obj in player_hand:
         print(card_obj.name, card_obj.value)
     print("")
     print("For a total value of: ", eval_hand(player_hand))
+    print("")
 
 
 def print_computer_hand(computer_hand:[Card]) -> None:
@@ -178,10 +170,14 @@ def print_computer_hand(computer_hand:[Card]) -> None:
     the name, value of each card along with the value of all the cards
     in the list
     """
+    print("")
+    print("The Friend Computer's hand contains:")
+    print("")
     for card_obj in computer_hand:
         print(card_obj.name, card_obj.value)
-
-    print(eval_hand(computer_hand))
+    print("")
+    print("For a total value of: ", eval_hand(computer_hand))
+    print("")
 
 
 def getH_or_Schoice() -> str:
@@ -191,7 +187,7 @@ def getH_or_Schoice() -> str:
     it returns it else it keeps asking the user to enter a valid character
     """
     while 1:
-        user_input = input("Would you like to Hit(H) or Stay(S)?")
+        user_input = input("Would you like to Hit(H) or Stay(S)? ")
         if user_input.lower() == "h" or user_input.lower() == "s":
             return user_input.lower()
         else:
@@ -210,43 +206,44 @@ def stay_or_hit(player_hand:[Card], available_cards:[Card]) -> bool:
         new_card = draw_card(available_cards)
         player_hand.append(new_card)
         result = eval_hand(player_hand)
+        
+        print("You drew ", new_card.name, " which has a value of ", new_card.value)
+        print("Your hand now has a total value of: ", result)
+        print("")
 
         if  21 < result:
             print("Oh No !! Your hand has busted as it has exceeded 21")
-            print("Your hand now has a total value of: ", result)
+            print("Your hand had a total value of: ", result)
+            print("The Computer Player Won!")
+            return False
 
     elif user_input == "s":
         print('You chose to stay/skip your turn')
+        return True
 
-def get_bet_choice() -> str:
+
+def computer_turn(computer_hand:[Card], available_cards:[Card]) -> bool:
     """
-    This function asks the user whether he would want to Raise(R) or Stay(S). This function returns the character if it is valid,
-    else keeps asking the user to enter a valid input
+    This function evaluates the hand of the computer, if it
+    is less than 17 it hits else stays
     """
-    user_input = input().lower()
+    result = eval_hand(computer_hand)
 
-    while 1:
-        if user_input == "r" or user_input == "s":
-            return user_input
-        else:
-            print("Incorrect choice, choose either Raise(R) or Stay(S)")
+    if result < 17:
+        print("The Friend Computer Hits.")
 
+        new_card = draw_card(available_cards)
+        computer_hand.append(new_card)
+        result = eval_hand(computer_hand)
 
-def get_bet_amount(available_for_bet:int) -> int:
-    """
-    This function asks the user the amount he would like to bet by,
-    checks if it is a valid bet amount and returns it
-    """
-    while 1:
-        user_input = int(input("How much would you like to raise by? "))
+        if 21 < result:
+            print("The computer has bust. You win this round !!")
+            print_computer_hand(computer_hand)
+            return False
 
-        if user_input >= available_for_bet:
-            print("Not enough money to make this bet")
-        else:
-            return user_input
-
-
-
+    else:
+        print("The Friend Computer Stays.")
+        return True
 
 
 if "__main__" == __name__:
@@ -258,10 +255,68 @@ if "__main__" == __name__:
     available_cards = generate_shuffled_deck(deck_list)
     intro_message()
 
-    # Each round
-    current_hand = create_starting_hand(available_cards,2)
-    print_player_hand(current_hand)
+    # Each round begins with starting a hand for each player
+    player_hand = create_starting_hand(available_cards,2)
+    computer_hand = create_starting_hand(available_cards,2)
 
-    # Each round is composed of a series of turns
-    # Each Turn
-    stay_or_hit(current_hand, available_cards)
+    while 1:
+        # Print Players hand
+        print_player_hand(player_hand)
+        print_player_hand(computer_hand)
+
+        # Each round is composed of a series of turns
+        # Each Turn
+
+        player_s_h = stay_or_hit(player_hand, available_cards)
+        # Check to see if player bust, if they did
+        # the player lost the game
+        if player_s_h == False:
+            break
+
+        computer_s_h = computer_turn(computer_hand, available_cards)
+        # Check to see if Computer Player bust, if they did
+        # the Computer Player lost the game
+        if computer_s_h == False:
+            break
+
+        print_player_hand(player_hand)
+
+        # If both players stay
+        if player_s_h == True and computer_s_h == True:
+            player_result = eval_hand(player_hand)
+            computer_result = eval_hand(computer_hand)
+
+            print("All player have chosen to stay, so we will reveal hands.")
+            print("Your hand had a final value of ", player_result)
+            print('The Friend Computer had a final value of', computer_result)
+            if player_result == 21 and computer_result == 21:
+                print("This is a tie!")
+                break
+
+            elif player_result == 21:
+                print("You Win!")
+                break
+
+            elif computer_result == 21:
+                print("The Computer Player Won!")
+                break
+
+            elif player_result > 21:
+                print("You bust! Computer Player wins!")
+                break
+
+            elif computer_result > 21:
+                print("Computer Player bust! You win")
+                break
+
+            elif player_result <= 21:
+                print("You win!")
+                break
+
+            elif computer_result <= 21:
+                print("Computer Player wins!")
+                break
+
+            else:
+                print("Tie")
+                break
