@@ -36,14 +36,6 @@ class Card:
         # Value of the card
         self.value = value
 
-class Bets:
-    def __init__(self, player_funds:int, player_bet:int):
-        # Set this to 100 in the main()
-        self.player_funds = player_funds
-
-        # Manages bets
-        self.player_bet = player_bet
-
 
 def make_card(name:str, value:int) -> Card:
     """
@@ -68,15 +60,6 @@ def make_card_deck_list(my_deck:[{str:int}]) -> [Card]:
         card_list.append(card_obj)
 
     return card_list
-
-
-def print_deck(card_deck_list:[Card]) -> None:
-    """
-    This function takes in as input the list of Card objects and
-    prints the name and value of each card in the list
-    """
-    for card_obj in card_deck_list:
-        print(card_obj.name, card_obj.value)
 
 
 def generate_shuffled_deck(full_deck:[Card]) -> [Card]:
@@ -124,15 +107,6 @@ def create_starting_hand(available_cards:[Card], num_to_draw:int) -> [Card]:
         starting_list.append(draw_card(available_cards))
 
     return starting_list
-
-
-def print_hand(card_list:[Card]) -> None:
-    """
-    This function takes is a list of Card objects as input and prints
-    the name and value of each card
-    """
-    for card_obj in card_list:
-        print(card_obj.name, card_obj.value)
 
 
 def eval_hand(card_list:[Card]) -> int:
@@ -206,7 +180,7 @@ def stay_or_hit(player_hand:[Card], available_cards:[Card]) -> bool:
         new_card = draw_card(available_cards)
         player_hand.append(new_card)
         result = eval_hand(player_hand)
-        
+
         print("You drew ", new_card.name, " which has a value of ", new_card.value)
         print("Your hand now has a total value of: ", result)
         print("")
@@ -246,8 +220,26 @@ def computer_turn(computer_hand:[Card], available_cards:[Card]) -> bool:
         return True
 
 
-if "__main__" == __name__:
+def play_another_game():
+    """
+    Asks the user if they would like to play again
+    """
+    user_input = input("Would you like to play again? Yes(Y) or No(N): ").lower()
 
+    if user_input == "y":
+        play_game()
+
+    elif user_input == "n":
+        print("Thanks for playing!")
+
+    else:
+        print("Wrong input. Type Y for Yes or N for No")
+
+
+def play_game():
+    """
+    Plays the game
+    """
     # Initial Round
 
     # Setting up the card deck
@@ -262,24 +254,25 @@ if "__main__" == __name__:
     while 1:
         # Print Players hand
         print_player_hand(player_hand)
-        print_player_hand(computer_hand)
 
         # Each round is composed of a series of turns
-        # Each Turn
+        # Each Turn turn consists of offering the player an opportunity to
+        # hit or stay, then offering the player a new betting opportunity after
+        # receiving their new card, and finally the Friend Computer choosing to stay or hit.
 
         player_s_h = stay_or_hit(player_hand, available_cards)
         # Check to see if player bust, if they did
         # the player lost the game
         if player_s_h == False:
+            play_another_game()
             break
 
         computer_s_h = computer_turn(computer_hand, available_cards)
         # Check to see if Computer Player bust, if they did
         # the Computer Player lost the game
         if computer_s_h == False:
+            play_another_game()
             break
-
-        print_player_hand(player_hand)
 
         # If both players stay
         if player_s_h == True and computer_s_h == True:
@@ -291,32 +284,45 @@ if "__main__" == __name__:
             print('The Friend Computer had a final value of', computer_result)
             if player_result == 21 and computer_result == 21:
                 print("This is a tie!")
+                play_another_game()
                 break
 
             elif player_result == 21:
                 print("You Win!")
+                play_another_game()
                 break
 
             elif computer_result == 21:
                 print("The Computer Player Won!")
+                play_another_game()
                 break
 
             elif player_result > 21:
                 print("You bust! Computer Player wins!")
+                play_another_game()
                 break
 
             elif computer_result > 21:
                 print("Computer Player bust! You win")
+                play_another_game()
                 break
 
-            elif player_result <= 21:
-                print("You win!")
-                break
-
-            elif computer_result <= 21:
+            elif player_result < computer_result:
                 print("Computer Player wins!")
+                play_another_game()
+                break
+
+            elif player_result > computer_result:
+                print("You win!")
+                play_another_game()
                 break
 
             else:
                 print("Tie")
+                play_another_game()
                 break
+
+
+if "__main__" == __name__:
+    # Play the game
+    play_game()
