@@ -3,11 +3,10 @@
 
 # Description
 - This a one player versus Computer Black Jack game
-- This game does not implement the idea of betting since it is a friendly introduction to the game of Black Jack
 
 # Design Choices
-- I created a class called Card with member variables of name and value. This will help differentiate the cards since they have repeated values (such as 10, 7, etc.) but different names.
-  I can  then make Card objects for each card
+- I created a class called Card with member variables of name and value. This will help differentiate the cards since they have repeated values (such as 10, 7, etc.) but different names. I can then make Card objects for each card
+- I also created a class called Bets that handles the bets the playre can make
 - For functions, I had a total of 14 functions each that helped implement the game. You can read more about each function on the comments I made.
 - Logic for the Computer Player. The Computer Player will hit (draw a card) wen the result of the evaluation of its card is less than 17. Otherwise it will stay and not draw a card.
 
